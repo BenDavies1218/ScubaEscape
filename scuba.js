@@ -1,4 +1,4 @@
-import { Text, Title, AirRemaining, Player, Background } from "./classes.js";
+import { Text, Title, AirRemaining, Player, Background, Wall } from "./classes.js";
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -7,7 +7,10 @@ canvas.width = 1440;
 canvas.height = 720;
 
 let waterImage = new Image();
-waterImage.src = "./water_1.jpg";
+waterImage.src = "./images/water_1.jpg";
+
+let wallImage = new Image();
+wallImage.src = "./images/walls.jpg"
 
 const keys = {
   right: {
@@ -25,15 +28,37 @@ const keys = {
 };
 
 let scrollOffset = 0;
-let start = true;
+let start = false;
 let depth = 1;
 let time = 0;
 let airRemainingLt = 550;
 let airRemainingBar = 207;
 let animateFrame = 0;
 let consumptionRate = 40;
+let walls = new Wall(wallImage, 0, 200)
 let player = new Player("green");
 let airRemaining = new AirRemaining(airRemainingLt);
+let text = [new Title(
+  "Scuba Escape",
+  "24px Dune Rise",
+  canvas.width * 0.5 - 130,
+  50
+),
+new Text("Air Tank Size: 40cu ft", "16px Serif", 50, 45),
+new Text(
+  `Air Consumption Rate (LPM): ${consumptionRate}`,
+  "16px Serif",
+  50,
+  75
+),
+new Text(
+  `Air Remaining: ${airRemainingBar} BAR`,
+  "16px Serif",
+  canvas.width * 0.5 - 80,
+  110
+),
+new Text(`Time: ${time} Seconds`, "16px Serif", 50, 100),
+new Text(`Depth: ${depth} Metres`, "16px Serif", 50, 125)]
 
 /*
 consumption rate litres per minute
@@ -79,6 +104,8 @@ addEventListener("click", function (event) {
   }
 });
 
+
+
 function Menu() {
   c.clearRect(0, 0, canvas.width, canvas.height);
   new Title(
@@ -96,27 +123,10 @@ function startGame() {
   requestAnimationFrame(startGame);
   c.clearRect(0, 0, canvas.width, canvas.height);
   new Background(waterImage, 0, 0).draw();
-  new Title(
-    "Scuba Escape",
-    "24px Dune Rise",
-    canvas.width * 0.5 - 130,
-    50
-  ).update();
-  new Text("Air Tank Size: 40cu ft", "16px Serif", 50, 45).update();
-  new Text(
-    `Air Consumption Rate (LPM): ${consumptionRate}`,
-    "16px Serif",
-    50,
-    75
-  ).update();
-  new Text(
-    `Air Remaining: ${airRemainingBar} BAR`,
-    "16px Serif",
-    canvas.width * 0.5 - 80,
-    110
-  ).update();
-  new Text(`Time: ${time} Seconds`, "16px Serif", 50, 100).update();
-  new Text(`Depth: ${depth} Metres`, "16px Serif", 50, 125).update();
+  walls.draw();
+  text.forEach(text => {
+    text.update()
+  });
   airRemaining.update();
   player.update();
   depth = Math.round((player.position.y - 370) / 100);
@@ -142,16 +152,25 @@ function startGame() {
     airRemaining.colour = "green";
   }
 
-  if (keys.left.pressed == true) {
+  if (keys.left.pressed && player.position.x > 400) {
     player.position.x -= 5;
-  } else if (keys.right.pressed == true) {
+  } else if (keys.right.pressed && player.position.x < 900) {
     player.position.x += 5;
-  } else if (keys.down.pressed == true) {
+  } else if (keys.down.pressed && player.position.y < 500) {
     player.position.y += 5;
-  } else if (keys.up.pressed == true) {
+  } else if (keys.up.pressed && player.position.y > 300) {
     player.position.y -= 5;
   } else {
     player.position.x += 0;
+    if (keys.right.pressed) {
+      walls.x -= 5
+    } else if (keys.left.pressed) {
+      walls.x += 5
+    } else if (keys.down.pressed) {
+      walls.y -= 5
+    } else if (keys.up.pressed) {
+      walls.y += 5
+    }
   }
 }
 

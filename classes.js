@@ -97,8 +97,26 @@ export class Background {
     this.y = y;
 
     this.draw = function () {
-      c.fillStyle = "#ffffff";
-      c.drawImage(this.image, this.x, this.y, innerWidth, innerHeight);
+      c.filter = "#FFFFFF";
+      c.globalAlpha = 0.5;
+      for (let i = 0; i < 5; i++) {
+        c.drawImage(this.image, this.x, this.y, 300, 300);
+        this.x += 300
+      }
+      c.globalAlpha = 1;
+    };
+  }
+}
+
+export class Wall {
+  constructor(image, x, y) {
+    this.image = image;
+    this.x = x;
+    this.y = y;
+
+    this.draw = function () {
+      c.drawImage(this.image, 2900, 2200,
+        2000, 700, this.x, this.y, 600, 300);
     };
   }
 }
