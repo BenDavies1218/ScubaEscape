@@ -7,6 +7,8 @@ import {
   Wall,
 } from "./classes.js";
 
+import { playerCollision } from "./functions.js";
+
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
@@ -51,38 +53,112 @@ let walls = [
     image: wallImage,
   }),
   new Wall({
-    x: -20,
+    x: 850,
+    y: 700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 850,
+    y: 1200,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 850,
+    y: 1700,
+    image: wallImage,
+  }),
+
+  new Wall({
+    x: 850,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 550,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 250,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: -50,
+    y: 1700,
+    image: wallImage,
+  }),
+
+  new Wall({
+    x: -350,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: -650,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: -950,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: -1250,
+    y: 1700,
+    image: wallImage,
+  }),
+
+  new Wall({
+    x: -1550,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 1150,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 1150,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 2050,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 1750,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 1450,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 250,
+    y: 1700,
+    image: wallImage,
+  }),
+  new Wall({
+    x: -50,
+    y: 1700,
+    image: wallImage,
+  }),
+
+  new Wall({
+    x: 250,
+    y: 500,
+    image: wallImage,
+  }),
+  new Wall({
+    x: 250,
     y: 200,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 850,
-    y: 1000,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 850,
-    y: 1400,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -20,
-    y: 1000,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 850,
-    y: 1600,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -20,
-    y: 1600,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 650,
-    y: 2400,
     image: wallImage,
   }),
 ];
@@ -167,6 +243,7 @@ function startGame() {
   ];
   requestAnimationFrame(startGame);
   c.clearRect(0, 0, canvas.width, canvas.height);
+
   new Background(waterImage, 0, -100).draw();
   new Background(waterImage, 0, 200).draw();
   new Background(waterImage, 0, 500).draw();
@@ -203,34 +280,36 @@ function startGame() {
     airRemaining.colour = "green";
   }
 
-  if (keys.left.pressed && player.position.x > 400) {
-    player.position.x -= 5;
-  } else if (keys.right.pressed && player.position.x < 900) {
-    player.position.x += 5;
-  } else if (keys.down.pressed && player.position.y < 400) {
-    player.position.y += 5;
-  } else if (keys.up.pressed && player.position.y > 300) {
-    player.position.y -= 5;
-  } else {
-    player.position.x += 0;
-    if (keys.right.pressed) {
-      walls.forEach((wall) => {
-        wall.position.x -= 5;
-      });
-    } else if (keys.left.pressed) {
-      walls.forEach((wall) => {
-        wall.position.x += 5;
-      });
-    } else if (keys.down.pressed) {
-      walls.forEach((wall) => {
-        wall.position.y -= 5;
-        player.posx += 5;
-      });
-    } else if (keys.up.pressed) {
-      walls.forEach((wall) => {
-        wall.position.y += 5;
-        player.posx -= 5;
-      });
+  if (!playerCollision(player, walls)) {
+    if (keys.left.pressed && player.position.x > 400) {
+      player.position.x -= 5;
+    } else if (keys.right.pressed && player.position.x < 900) {
+      player.position.x += 5;
+    } else if (keys.down.pressed && player.position.y < 400) {
+      player.position.y += 5;
+    } else if (keys.up.pressed && player.position.y > 300) {
+      player.position.y -= 5;
+    } else {
+      player.position.x += 0;
+      if (keys.right.pressed) {
+        walls.forEach((wall) => {
+          wall.position.x -= 5;
+        });
+      } else if (keys.left.pressed) {
+        walls.forEach((wall) => {
+          wall.position.x += 5;
+        });
+      } else if (keys.down.pressed) {
+        walls.forEach((wall) => {
+          wall.position.y -= 5;
+          player.posx += 5;
+        });
+      } else if (keys.up.pressed) {
+        walls.forEach((wall) => {
+          wall.position.y += 5;
+          player.posx -= 5;
+        });
+      }
     }
   }
 }

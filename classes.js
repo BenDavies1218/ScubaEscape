@@ -66,6 +66,7 @@ export class AirRemaining {
 export class Player {
   constructor(colour) {
     this.posx = canvas.width * 0.5 - 25;
+    this.posy = 270;
     this.position = {
       x: canvas.width * 0.5 - 25,
       y: 270,
@@ -111,10 +112,16 @@ export class Wall {
     };
     this.image = image;
 
-    this.width = w || image.width;
-    this.height = h || image.height;
+    this.width = w || image.width / 2;
+    this.height = h || image.height / 2;
   }
   draw() {
-    c.drawImage(this.image, this.position.x, this.position.y);
+    c.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
   }
 }
