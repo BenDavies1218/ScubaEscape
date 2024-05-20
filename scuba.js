@@ -5,6 +5,7 @@ import {
   Player,
   Background,
   Wall,
+  StatBackground,
 } from "./classes.js";
 
 import { playerCollision } from "./functions.js";
@@ -20,6 +21,15 @@ waterImage.src = "./images/water_1.jpg";
 
 let wallImage = new Image();
 wallImage.src = "./images/walls.jpg";
+
+let grassImage = new Image();
+grassImage.src = "./images/grass.jpg";
+
+let subImage = new Image();
+subImage.src = "./images/sub.png";
+
+let subImage2 = new Image();
+subImage2.src = "./images/sub2.png";
 
 const keys = {
   right: {
@@ -46,11 +56,36 @@ let animateFrame = 0;
 let consumptionRate = 40;
 let airRemaining = new AirRemaining(airRemainingLt);
 
+// { x, y, image, w, h, sw, sh }
 let walls = [
   new Wall({
     x: 850,
     y: 200,
     image: wallImage,
+  }),
+  new Wall({
+    x: 550,
+    y: 200,
+    image: wallImage,
+    h: 110,
+    sw: 500,
+    sh: 200,
+  }),
+  new Wall({
+    x: 1150,
+    y: 200,
+    image: wallImage,
+    h: 110,
+    sw: 500,
+    sh: 200,
+  }),
+  new Wall({
+    x: -50,
+    y: 200,
+    image: wallImage,
+    h: 110,
+    sw: 500,
+    sh: 200,
   }),
   new Wall({
     x: 850,
@@ -162,8 +197,14 @@ let walls = [
     image: wallImage,
   }),
 ];
-let player = new Player("green");
 
+var grass = [
+  new StatBackground(grassImage, 0, -100),
+  new StatBackground(grassImage, 300, -100),
+  new StatBackground(grassImage, 600, -100),
+  new StatBackground(grassImage, 900, -100),
+  new StatBackground(grassImage, 1200, -100),
+];
 /*
 consumption rate litres per minute
 0mt = 40
@@ -183,20 +224,12 @@ addEventListener("click", function (event) {
   if (
     clickX >= canvas.width * 0.5 - 80 &&
     clickX <= canvas.width * 0.5 + 140 &&
-    clickY >= 280 - 32 &&
-    clickY <= 280
+    clickY >= 380 - 32 &&
+    clickY <= 380
   ) {
     start = true;
     c.clearRect(0, 0, canvas.width, canvas.height);
     startGame();
-  } else if (
-    clickX >= canvas.width * 0.5 - 60 &&
-    clickX <= canvas.width * 0.5 + 80 &&
-    clickY >= 360 - 32 &&
-    clickY <= 360
-  ) {
-    c.clearRect(0, 0, canvas.width, canvas.height);
-    options();
   } else if (
     clickX >= canvas.width * 0.5 - 40 &&
     clickX <= canvas.width * 0.5 + 60 &&
@@ -209,18 +242,33 @@ addEventListener("click", function (event) {
 });
 
 function Menu() {
+  requestAnimationFrame(Menu);
   c.clearRect(0, 0, canvas.width, canvas.height);
+  new Background(waterImage, 0, 200).draw();
+  new Background(waterImage, 0, 500).draw();
+  walls.forEach((wall) => {
+    wall.draw();
+  });
+  new Background(grassImage, 0, -100).draw();
   new Title(
     "Scuba Escape",
     "48px Dune Rise",
     canvas.width * 0.5 - 280,
     120
   ).update();
-  new Text("Start Game", "32px Serif", canvas.width * 0.5 - 80, 280).update();
-  new Text("Options", "32px Serif", canvas.width * 0.5 - 60, 360).update();
+  new Text("Start Game", "32px Serif", canvas.width * 0.5 - 80, 380).update();
   new Text("Help", "32px Serif", canvas.width * 0.5 - 40, 440).update();
 }
 
+let player = new Player({
+  x: canvas.width * 0.5 - 35,
+  y: 370,
+  image: subImage,
+  sw: 1500,
+  sh: 1000,
+  w: 150,
+  H: 100,
+});
 function startGame() {
   let timeText = new Text(`Time: ${time} Seconds`, "16px Serif", 50, 100);
   let text = [
@@ -243,20 +291,23 @@ function startGame() {
   ];
   requestAnimationFrame(startGame);
   c.clearRect(0, 0, canvas.width, canvas.height);
-
   new Background(waterImage, 0, -100).draw();
   new Background(waterImage, 0, 200).draw();
   new Background(waterImage, 0, 500).draw();
   walls.forEach((wall) => {
     wall.draw();
   });
+  grass.forEach((grass) => {
+    grass.draw();
+  });
+
   text.forEach((text) => {
     text.update();
   });
   timeText.update();
   airRemaining.update();
   player.update();
-  depth = Math.round((player.posx - 570) / 100);
+  depth = Math.round((player.posx - 570) / 200);
   consumptionRate = Math.floor(40 * (depth / 5));
   animateFrame += 1;
 
@@ -282,8 +333,12 @@ function startGame() {
 
   if (!playerCollision(player, walls)) {
     if (keys.left.pressed && player.position.x > 400) {
-      player.position.x -= 5;
+      player.image = subImage;
+      (player.sx = 2650), (player.sy = 1250), (player.position.x -= 5);
     } else if (keys.right.pressed && player.position.x < 900) {
+      player.image = subImage2;
+      player.sx = 300;
+      player.sy = 1250;
       player.position.x += 5;
     } else if (keys.down.pressed && player.position.y < 400) {
       player.position.y += 5;
@@ -292,19 +347,31 @@ function startGame() {
     } else {
       player.position.x += 0;
       if (keys.right.pressed) {
+        grass.forEach((img) => {
+          img.position.x -= 5;
+        });
         walls.forEach((wall) => {
           wall.position.x -= 5;
         });
       } else if (keys.left.pressed) {
+        grass.forEach((img) => {
+          img.position.x += 5;
+        });
         walls.forEach((wall) => {
           wall.position.x += 5;
         });
       } else if (keys.down.pressed) {
+        grass.forEach((img) => {
+          img.position.y -= 5;
+        });
         walls.forEach((wall) => {
           wall.position.y -= 5;
           player.posx += 5;
         });
       } else if (keys.up.pressed) {
+        grass.forEach((img) => {
+          img.position.y += 5;
+        });
         walls.forEach((wall) => {
           wall.position.y += 5;
           player.posx -= 5;
@@ -326,6 +393,19 @@ function help() {
 function init() {
   Menu();
 }
+subImage.onload = function () {
+  player = new Player({
+    x: canvas.width * 0.5 - 85,
+    y: 370,
+    image: subImage,
+    sw: 1500,
+    sh: 1000,
+    w: 150,
+    h: 100,
+    sx: 2650,
+    sy: 1250,
+  });
+};
 init();
 
 addEventListener("keydown", ({ keyCode }) => {

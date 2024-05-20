@@ -64,21 +64,33 @@ export class AirRemaining {
 }
 
 export class Player {
-  constructor(colour) {
-    this.posx = canvas.width * 0.5 - 25;
-    this.posy = 270;
+  constructor({ x, y, image, w, h, sw, sh, sy, sx }) {
+    this.posx = canvas.width * 0.5 - 35;
+    this.posy = 370;
+    this.image = image;
     this.position = {
-      x: canvas.width * 0.5 - 25,
-      y: 270,
+      x: x,
+      y: y,
     };
+    this.sx = sx;
+    this.sy = sy;
+    this.sw = sw;
+    this.sh = sh;
+    this.width = w;
+    this.height = h;
 
-    this.width = 50;
-    this.height = 100;
-
-    this.colour = colour;
     this.draw = function () {
-      c.fillStyle = this.colour;
-      c.fillRect(this.position.x, this.position.y, this.width, this.height);
+      c.drawImage(
+        this.image,
+        this.sx,
+        this.sy,
+        this.sw,
+        this.sh,
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+      );
     };
     this.update = function () {
       this.draw();
@@ -105,12 +117,16 @@ export class Background {
 }
 
 export class Wall {
-  constructor({ x, y, image, w, h }) {
+  constructor({ x, y, image, w, h, sw, sh }) {
     this.position = {
       x,
       y,
     };
     this.image = image;
+    this.sx = 0;
+    this.sy = 0;
+    this.sw = sw || image.width;
+    this.sh = sh || image.height;
 
     this.width = w || image.width / 2;
     this.height = h || image.height / 2;
@@ -118,10 +134,28 @@ export class Wall {
   draw() {
     c.drawImage(
       this.image,
+      this.sx,
+      this.sy,
+      this.sw,
+      this.sh,
       this.position.x,
       this.position.y,
       this.width,
       this.height
     );
+  }
+}
+
+export class StatBackground {
+  constructor(image, x, y) {
+    this.image = image;
+    this.position = {
+      x,
+      y,
+    };
+
+    this.draw = function () {
+      c.drawImage(this.image, this.position.x, this.position.y, 300, 300);
+    };
   }
 }
