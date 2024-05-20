@@ -46,8 +46,6 @@ const keys = {
   },
 };
 
-let scrollOffset = 0;
-let start = false;
 let depth = 0;
 let time = 0;
 let airRemainingLt = 550;
@@ -198,25 +196,13 @@ let walls = [
   }),
 ];
 
-var grass = [
+let grass = [
   new StatBackground(grassImage, 0, -100),
   new StatBackground(grassImage, 300, -100),
   new StatBackground(grassImage, 600, -100),
   new StatBackground(grassImage, 900, -100),
   new StatBackground(grassImage, 1200, -100),
 ];
-/*
-consumption rate litres per minute
-0mt = 40
-10mt = 80
-20mt = 120
-30mt = 160
-40mt = 200
-50mt = 240
-60mt = 280
-
-starting air will be 550LT
-*/
 
 addEventListener("click", function (event) {
   const clickX = event.clientX - canvas.getBoundingClientRect().left;
@@ -227,12 +213,11 @@ addEventListener("click", function (event) {
     clickY >= 380 - 32 &&
     clickY <= 380
   ) {
-    start = true;
     c.clearRect(0, 0, canvas.width, canvas.height);
     startGame();
   } else if (
-    clickX >= canvas.width * 0.5 - 40 &&
-    clickX <= canvas.width * 0.5 + 60 &&
+    clickX >= canvas.width * 0.5 - 80 &&
+    clickX <= canvas.width * 0.5 + 100 &&
     clickY >= 440 - 32 &&
     clickY <= 440
   ) {
@@ -241,14 +226,29 @@ addEventListener("click", function (event) {
   }
 });
 
-function Menu() {
+function drawWalls() {
+  return new Promise((resolve) => {
+    walls.forEach((wall, index) => {
+      wall.draw();
+      if (index === walls.length - 1) {
+        resolve();
+      }
+    });
+  });
+}
+
+async function Menu() {
   requestAnimationFrame(Menu);
   c.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the background images first
   new Background(waterImage, 0, 200).draw();
   new Background(waterImage, 0, 500).draw();
-  walls.forEach((wall) => {
-    wall.draw();
-  });
+
+  // Wait for all walls to be drawn
+  await drawWalls();
+
+  // Draw the remaining background, title, and text after walls
   new Background(grassImage, 0, -100).draw();
   new Title(
     "Scuba Escape",
@@ -269,6 +269,7 @@ let player = new Player({
   w: 150,
   H: 100,
 });
+
 function startGame() {
   let timeText = new Text(`Time: ${time} Seconds`, "16px Serif", 50, 100);
   let text = [
@@ -307,7 +308,7 @@ function startGame() {
   timeText.update();
   airRemaining.update();
   player.update();
-  depth = Math.round((player.posx - 570) / 200);
+  depth = Math.round((player.posx - 570) / 400);
   consumptionRate = Math.floor(40 * (depth / 5));
   animateFrame += 1;
 
@@ -381,13 +382,61 @@ function startGame() {
   }
 }
 
-function options() {
-  new Title("Scuba Escape", "24px Dune Rise", canvas.width * 0.5 - 130, 50);
-}
+async function help() {
+  requestAnimationFrame(help);
+  c.clearRect(0, 0, canvas.width, canvas.height);
 
-function help() {
-  new Title("Scuba Escape", "24px Dune Rise", canvas.width * 0.5 - 130, 50);
-  console.log("Help clicked");
+  // Draw the background images first
+  new Background(waterImage, 0, 200).draw();
+  new Background(waterImage, 0, 500).draw();
+
+  // Wait for all walls to be drawn
+  await drawWalls();
+
+  // Draw the remaining background, title, and text after walls
+  new Background(grassImage, 0, -100).draw();
+  c.fillStyle = "black";
+  c.fillRect(canvas.width * 0.5 - 340, 330, 670, 320);
+  c.fillStyle = "white";
+  c.fillRect(canvas.width * 0.5 - 330, 340, 650, 300);
+  new Title(
+    "Scuba Escape",
+    "48px Dune Rise",
+    canvas.width * 0.5 - 280,
+    120
+  ).update();
+  new Text("Start Game", "32px Serif", canvas.width * 0.5 - 80, 380).update();
+  new Text(
+    "Move UP:     W",
+    "32px Serif",
+    canvas.width * 0.5 - 120,
+    440
+  ).update();
+  new Text(
+    "Move Down:   S",
+    "32px Serif",
+    canvas.width * 0.5 - 120,
+    480
+  ).update();
+  new Text(
+    "Move Right:  D",
+    "32px Serif",
+    canvas.width * 0.5 - 120,
+    520
+  ).update();
+  new Text(
+    "Move Left:   A",
+    "32px Serif",
+    canvas.width * 0.5 - 120,
+    560
+  ).update();
+  new Text(
+    "Find the surface before your air Runs OUT!!",
+    "32px Serif",
+    canvas.width * 0.5 - 290,
+    600,
+    "red"
+  ).update();
 }
 
 function init() {

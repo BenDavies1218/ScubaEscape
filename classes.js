@@ -12,12 +12,12 @@ window.addEventListener("mousemove", function (event) {
 });
 
 export class Text {
-  constructor(text, font, x, y) {
+  constructor(text, font, x, y, color) {
     this.text = text;
     this.font = font;
     this.x = x;
     this.y = y;
-    this.colour = "black";
+    this.colour = color || "black";
 
     this.draw = function () {
       c.fillStyle = this.colour;
