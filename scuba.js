@@ -4,9 +4,10 @@ import {
   AirRemaining,
   Player,
   Background,
-  Wall,
   StatBackground,
 } from "./classes.js";
+
+import { wallsData } from "./gameObjectData.js";
 
 import { playerCollision } from "./functions.js";
 
@@ -30,6 +31,9 @@ subImage.src = "./images/sub.png";
 
 let subImage2 = new Image();
 subImage2.src = "./images/sub2.png";
+
+let wonImg = new Image();
+wonImg.src = "./images/greenimg.png";
 
 const keys = {
   right: {
@@ -55,153 +59,26 @@ let consumptionRate = 40;
 let airRemaining = new AirRemaining(airRemainingLt);
 
 // { x, y, image, w, h, sw, sh }
-let walls = [
-  new Wall({
-    x: 850,
-    y: 200,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 550,
-    y: 200,
-    image: wallImage,
-    h: 110,
-    sw: 500,
-    sh: 200,
-  }),
-  new Wall({
-    x: 1150,
-    y: 200,
-    image: wallImage,
-    h: 110,
-    sw: 500,
-    sh: 200,
-  }),
-  new Wall({
-    x: -50,
-    y: 200,
-    image: wallImage,
-    h: 110,
-    sw: 500,
-    sh: 200,
-  }),
-  new Wall({
-    x: 850,
-    y: 700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 850,
-    y: 1200,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 850,
-    y: 1700,
-    image: wallImage,
-  }),
-
-  new Wall({
-    x: 850,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 550,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 250,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -50,
-    y: 1700,
-    image: wallImage,
-  }),
-
-  new Wall({
-    x: -350,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -650,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -950,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -1250,
-    y: 1700,
-    image: wallImage,
-  }),
-
-  new Wall({
-    x: -1550,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 1150,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 1150,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 2050,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 1750,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 1450,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 250,
-    y: 1700,
-    image: wallImage,
-  }),
-  new Wall({
-    x: -50,
-    y: 1700,
-    image: wallImage,
-  }),
-
-  new Wall({
-    x: 250,
-    y: 500,
-    image: wallImage,
-  }),
-  new Wall({
-    x: 250,
-    y: 200,
-    image: wallImage,
-  }),
-];
+let walls = wallsData;
 
 let grass = [
+  new StatBackground(grassImage, -1800, -100),
+  new StatBackground(grassImage, -1500, -100),
+  new StatBackground(grassImage, -1200, -100),
+  new StatBackground(grassImage, -900, -100),
+  new StatBackground(grassImage, -600, -100),
+  new StatBackground(grassImage, -300, -100),
   new StatBackground(grassImage, 0, -100),
   new StatBackground(grassImage, 300, -100),
   new StatBackground(grassImage, 600, -100),
   new StatBackground(grassImage, 900, -100),
   new StatBackground(grassImage, 1200, -100),
+  new StatBackground(grassImage, 1500, -100),
+  new StatBackground(grassImage, 1800, -100),
+  new StatBackground(grassImage, 2100, -100),
+  new StatBackground(grassImage, 2400, -100),
+  new StatBackground(grassImage, 2700, -100),
+  new StatBackground(wonImg, 3250, -100),
 ];
 
 addEventListener("click", function (event) {
@@ -238,26 +115,25 @@ function drawWalls() {
 }
 
 async function Menu() {
-  requestAnimationFrame(Menu);
-  c.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Draw the background images first
-  new Background(waterImage, 0, 200).draw();
-  new Background(waterImage, 0, 500).draw();
-
-  // Wait for all walls to be drawn
   await drawWalls();
 
-  // Draw the remaining background, title, and text after walls
-  new Background(grassImage, 0, -100).draw();
-  new Title(
-    "Scuba Escape",
-    "48px Dune Rise",
-    canvas.width * 0.5 - 280,
-    120
-  ).update();
-  new Text("Start Game", "32px Serif", canvas.width * 0.5 - 80, 380).update();
-  new Text("Help", "32px Serif", canvas.width * 0.5 - 40, 440).update();
+  function menuLoop() {
+    requestAnimationFrame(menuLoop);
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    new Background(waterImage, 0, 200).draw();
+    new Background(waterImage, 0, 500).draw();
+
+    new Background(grassImage, 0, -100).draw();
+    new Title(
+      "Scuba Escape",
+      "48px Dune Rise",
+      canvas.width * 0.5 - 280,
+      120
+    ).update();
+    new Text("Start Game", "32px Serif", canvas.width * 0.5 - 80, 380).update();
+    new Text("Help", "32px Serif", canvas.width * 0.5 - 40, 440).update();
+  }
+  menuLoop();
 }
 
 let player = new Player({
@@ -308,10 +184,19 @@ function startGame() {
   timeText.update();
   airRemaining.update();
   player.update();
-  depth = Math.round((player.posx - 570) / 400);
+  depth = Math.round((player.posx - 570) / 1000);
   consumptionRate = Math.floor(40 * (depth / 5));
   animateFrame += 1;
 
+  if (player.posx < -18750) {
+    endGame("won");
+    return;
+  }
+
+  if (airRemainingBar < 0) {
+    endGame();
+    return;
+  }
   if (animateFrame == 60) {
     time++;
     animateFrame = 0;
@@ -379,6 +264,33 @@ function startGame() {
         });
       }
     }
+  }
+}
+
+function endGame(result) {
+  cancelAnimationFrame(startGame);
+
+  c.fillStyle = "black";
+  c.fillRect(canvas.width * 0.5 - 340, 330, 670, 320);
+  c.fillStyle = "white";
+  c.fillRect(canvas.width * 0.5 - 330, 340, 650, 300);
+
+  if (result === "won") {
+    c.fillStyle = "green";
+    c.font = "38px serif";
+    c.fillText("You Won!", canvas.width * 0.5 - 100, 400);
+    c.font = "28px serif";
+    c.fillText(
+      "Congratulations for completing the Game!",
+      canvas.width * 0.5 - 250,
+      500
+    );
+  } else {
+    c.fillStyle = "red";
+    c.font = "48px serif";
+    c.fillText("Game Over", canvas.width * 0.5 - 110, 400);
+    c.font = "28px serif";
+    c.fillText("Better luck next time!", canvas.width * 0.5 - 115, 500);
   }
 }
 
@@ -455,7 +367,6 @@ subImage.onload = function () {
     sy: 1250,
   });
 };
-init();
 
 addEventListener("keydown", ({ keyCode }) => {
   switch (keyCode) {
@@ -490,3 +401,5 @@ addEventListener("keyup", ({ keyCode }) => {
       break;
   }
 });
+
+init();
