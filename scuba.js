@@ -84,6 +84,10 @@ let grass = [
 addEventListener("click", function (event) {
   const clickX = event.clientX - canvas.getBoundingClientRect().left;
   const clickY = event.clientY - canvas.getBoundingClientRect().top;
+  if (clickX >= 1150 && clickX <= 1320 && clickY >= 20 && clickY <= 75) {
+    c.clearRect(1150, 50, 170, 25);
+    window.location.reload();
+  }
   if (
     clickX >= canvas.width * 0.5 - 80 &&
     clickX <= canvas.width * 0.5 + 140 &&
@@ -91,7 +95,8 @@ addEventListener("click", function (event) {
     clickY <= 380
   ) {
     c.clearRect(0, 0, canvas.width, canvas.height);
-    startGame();
+
+    load();
   } else if (
     clickX >= canvas.width * 0.5 - 80 &&
     clickX <= canvas.width * 0.5 + 100 &&
@@ -115,8 +120,6 @@ function drawWalls() {
 }
 
 async function Menu() {
-  await drawWalls();
-
   function menuLoop() {
     requestAnimationFrame(menuLoop);
     c.clearRect(0, 0, canvas.width, canvas.height);
@@ -146,7 +149,39 @@ let player = new Player({
   H: 100,
 });
 
-function startGame() {
+async function load() {
+  await drawWalls();
+  cancelAnimationFrame(Menu);
+  displayLoadingText();
+
+  setTimeout(startGame, 1000);
+}
+
+function displayLoadingText() {
+  function loadingLoop() {
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    new Background(waterImage, 0, 200).draw();
+    new Background(waterImage, 0, 500).draw();
+    new Background(grassImage, 0, -100).draw();
+    new Title(
+      "Scuba Escape",
+      "48px Dune Rise",
+      canvas.width * 0.5 - 280,
+      120
+    ).update();
+    new Text(
+      "Loading Level",
+      "32px Serif",
+      canvas.width * 0.5 - 80,
+      540
+    ).update();
+    requestAnimationFrame(loadingLoop);
+  }
+
+  loadingLoop();
+}
+
+async function startGame() {
   let timeText = new Text(`Time: ${time} Seconds`, "16px Serif", 50, 100);
   let text = [
     new Title("Scuba Escape", "24px Dune Rise", canvas.width * 0.5 - 130, 50),
@@ -165,6 +200,12 @@ function startGame() {
     ),
     ,
     new Text(`Depth: ${depth} Metres`, "16px Serif", 50, 125),
+    new Text(
+      "Click here if only grass and water loaded",
+      "16px Serif",
+      1150,
+      50
+    ),
   ];
   requestAnimationFrame(startGame);
   c.clearRect(0, 0, canvas.width, canvas.height);
@@ -269,7 +310,6 @@ function startGame() {
 
 function endGame(result) {
   cancelAnimationFrame(startGame);
-
   c.fillStyle = "black";
   c.fillRect(canvas.width * 0.5 - 340, 330, 670, 320);
   c.fillStyle = "white";
